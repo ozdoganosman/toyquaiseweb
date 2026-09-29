@@ -3,7 +3,8 @@
 import { site, languages, defaultLanguage } from './site.mjs';
 import { ui } from './i18n.mjs';
 import { projects } from './projects/index.mjs';
-import { logo, icons } from './icons.mjs';
+import { icons } from './icons.mjs';
+import { scenes } from '../art/scenes.mjs';
 
 // ---------------------------------------------------------------- helpers
 
@@ -16,30 +17,32 @@ export const href = (lang, path) => (lang === defaultLanguage ? path : `/${lang}
 const formatDate = (lang, iso) =>
   new Intl.DateTimeFormat(ui[lang].htmlLang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(iso));
 
-const img = (slug, lang, file) => `/img/${slug}/${lang}/${file}`;
+const shot = (slug, lang, n) => `/img/${slug}/${lang}/shot-${n}.webp`;
 
-const storeButtons = (lang, p, { compact = false } = {}) => {
+/** A play-dough illustration from art/scenes.mjs. */
+const art = (name, cls, { lazy = true, priority = false } = {}) =>
+  `<img class="${cls}" src="/img/art/${name}.webp" alt="" width="${scenes[name].width}" height="${scenes[name].height}"${lazy ? ' loading="lazy"' : ''}${priority ? ' fetchpriority="high"' : ''} decoding="async">`;
+
+const wordmark = () => `${art('logo', 'brand-mark', { lazy: false })}<span>${site.name.toLowerCase()}</span>`;
+
+const storeButtons = (lang, p) => {
   const t = ui[lang].project;
   const out = [];
   const gp = p.links.googlePlay;
   if (gp?.live) {
-    out.push(`<a class="btn btn-store" href="${esc(gp.url)}">${icons.play}<span>${t.googlePlay}</span></a>`);
+    out.push(`<a class="btn btn-dark" href="${esc(gp.url)}">${icons.play}<span>${t.googlePlay}</span></a>`);
   } else if (gp) {
-    out.push(`<span class="btn btn-store is-soon" aria-disabled="true">${icons.play}<span>${t.googlePlaySoon}</span></span>`);
+    out.push(`<span class="btn btn-soon" aria-disabled="true">${icons.play}<span>${t.googlePlaySoon}</span></span>`);
   }
   if (p.links.web) {
-    out.push(`<a class="btn ${compact ? 'btn-ghost' : 'btn-secondary'}" href="${esc(p.links.web)}">${icons.globe}<span>${t.web}</span></a>`);
+    out.push(`<a class="btn btn-light" href="${esc(p.links.web)}">${icons.globe}<span>${t.web}</span></a>`);
   }
   return out.join('');
 };
 
-const platformChips = (lang, p) =>
-  `<ul class="chips" aria-label="${ui[lang].project.platforms}">${p.platforms
-    .map((k) => `<li>${k === 'web' ? icons.globe : icons.android}${ui[lang].platforms[k]}</li>`)
-    .join('')}</ul>`;
+const slabStyle = (p) => `--slab:${p.slab.light};--slab-dark:${p.slab.dark};--game-accent:${p.theme.accent}`;
 
-const projectStyle = (p) =>
-  `--p-accent:${p.theme.accent};--p-ink:${p.theme.ink};--p-surface:${p.theme.surface}`;
+const learnList = (items, cls = 'learn') => `<ul class="${cls}">${items.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 
 // ---------------------------------------------------------------- layout
 
@@ -48,15 +51,14 @@ export function layout(lang, path, page) {
   const other = languages.find((l) => l !== lang);
   const url = (l) => site.url + href(l, path);
   const nav = [
-    [href(lang, '/#projects'), t.nav.projects],
-    [href(lang, '/#about'), t.nav.about],
-    [href(lang, '/support/'), t.nav.support],
+    [href(lang, '/#games'), t.nav.games, '#games'],
+    [href(lang, '/#studio'), t.nav.studio, '#studio'],
+    [href(lang, '/support/'), t.nav.support, '/support/'],
   ];
   const navLinks = nav
-    .map(([h, label]) => `<a href="${h}"${page.section && h.includes(page.section) ? ' aria-current="page"' : ''}>${label}</a>`)
+    .map(([h, label, key]) => `<a href="${h}"${page.section === key ? ' aria-current="page"' : ''}>${label}</a>`)
     .join('');
-  const langLink = `<a class="lang-switch" href="${href(other, path)}" hreflang="${other}" lang="${other}">${icons.translate}<span>${t.switchTo}</span></a>`;
-  const image = site.url + (page.image || '/img/og.png');
+  const image = site.url + (page.image || '/img/og.jpg');
 
   return `<!doctype html>
 <html lang="${t.htmlLang}">
@@ -76,13 +78,12 @@ ${languages.map((l) => `<link rel="alternate" hreflang="${l}" href="${url(l)}">`
 <meta property="og:image" content="${image}">
 <meta property="og:locale" content="${t.locale}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0c1413" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#e8f4f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a2220" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/dynapuff-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=${page.cssVersion}">
 ${page.jsonLd ? `<script type="application/ld+json">${JSON.stringify(page.jsonLd)}</script>` : ''}
 </head>
@@ -90,15 +91,9 @@ ${page.jsonLd ? `<script type="application/ld+json">${JSON.stringify(page.jsonLd
 <a class="skip-link" href="#main">${t.skip}</a>
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="${href(lang, '/')}">${logo(34)}<span>${site.name}</span></a>
-    <nav class="nav-desktop" aria-label="${t.menu}">${navLinks}</nav>
-    <div class="header-end">
-      ${langLink}
-      <details class="nav-mobile">
-        <summary aria-label="${t.menu}">${icons.menu}</summary>
-        <nav aria-label="${t.menu}">${navLinks}</nav>
-      </details>
-    </div>
+    <a class="brand" href="${href(lang, '/')}">${wordmark()}</a>
+    <nav class="nav" aria-label="${t.menu}">${navLinks}</nav>
+    <a class="lang-switch" href="${href(other, path)}" hreflang="${other}" lang="${other}">${icons.translate}<span>${t.switchTo}</span></a>
   </div>
 </header>
 <main id="main">
@@ -112,10 +107,11 @@ ${footer(lang)}
 
 function footer(lang) {
   const t = ui[lang];
+  const year = new Date().getUTCFullYear();
   return `<footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
-      <a class="brand" href="${href(lang, '/')}">${logo(30)}<span>${site.name}</span></a>
+      <a class="brand" href="${href(lang, '/')}">${wordmark()}</a>
       <p>${t.footer.tagline}</p>
       <p><a href="mailto:${site.email}">${site.email}</a></p>
     </div>
@@ -126,7 +122,7 @@ function footer(lang) {
     <div>
       <h2>${t.footer.studio}</h2>
       <ul>
-        <li><a href="${href(lang, '/#about')}">${t.nav.about}</a></li>
+        <li><a href="${href(lang, '/#studio')}">${t.nav.studio}</a></li>
         <li><a href="${href(lang, '/support/')}">${t.nav.support}</a></li>
         <li><a href="${site.github}">GitHub</a></li>
       </ul>
@@ -140,7 +136,7 @@ function footer(lang) {
     </div>
   </div>
   <div class="wrap footer-bottom">
-    <p>© ${site.foundedYear === new Date().getUTCFullYear() ? site.foundedYear : `${site.foundedYear}–${new Date().getUTCFullYear()}`} ${site.name}. ${t.footer.rights}</p>
+    <p>© ${site.foundedYear === year ? year : `${site.foundedYear}–${year}`} ${site.name}. ${t.footer.rights}</p>
     <p>${t.footer.trademark}</p>
   </div>
 </footer>`;
@@ -151,37 +147,26 @@ function footer(lang) {
 export function home(lang) {
   const t = ui[lang];
   const h = t.home;
-  const principleIcons = [icons.userOff, icons.offline, icons.lock, icons.languages];
 
-  const cards = projects
+  const games = projects
     .map((p) => {
       const d = p[lang];
       const page = href(lang, `/${p.slug}/`);
-      return `<article class="project-card" style="${projectStyle(p)}">
-        <a class="project-card-media" href="${page}" tabindex="-1" aria-hidden="true">
-          <img src="${img(p.slug, lang, 'feature.webp')}" alt="" width="1024" height="500" loading="lazy" decoding="async">
-        </a>
-        <div class="project-card-body">
-          <div class="project-card-head">
-            <img class="app-icon" src="/img/${p.slug}/icon.webp" alt="" width="64" height="64" loading="lazy">
-            <div>
-              <h3><a href="${page}">${p.name}</a></h3>
-              <p class="kind">${d.kind}</p>
-            </div>
-          </div>
-          <p class="tagline">${d.tagline}</p>
-          ${platformChips(lang, p)}
+      return `<article class="game" style="${slabStyle(p)}" aria-labelledby="game-${p.slug}">
+        <a class="game-media" href="${page}" tabindex="-1" aria-hidden="true">${art(p.art, 'game-art')}</a>
+        <div class="game-body">
+          <p class="game-kind"><img class="app-icon" src="/img/${p.slug}/icon.webp" alt="" width="44" height="44" loading="lazy">${d.kind}</p>
+          <h3 id="game-${p.slug}"><a href="${page}">${p.name}</a></h3>
+          <p class="game-summary">${d.summary}</p>
+          <h4>${t.project.learn}</h4>
+          ${learnList(d.learn)}
           <div class="actions">
             <a class="btn btn-primary" href="${page}"><span>${t.project.learnMore}</span>${icons.arrow}</a>
-            ${storeButtons(lang, p, { compact: true })}
+            ${storeButtons(lang, p)}
           </div>
         </div>
       </article>`;
     })
-    .join('');
-
-  const tiles = projects
-    .map((p, i) => `<img class="hero-tile hero-tile-${i + 1}" src="/img/${p.slug}/icon.webp" alt="" width="160" height="160">`)
     .join('');
 
   return {
@@ -194,64 +179,45 @@ export function home(lang) {
       url: site.url + '/',
       logo: site.url + '/icon-512.png',
       email: site.email,
+      description: h.description,
+      address: { '@type': 'PostalAddress', addressCountry: 'TR' },
       sameAs: [site.github],
     },
     body: `
 <section class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow">${h.eyebrow}</p>
+      <p class="kicker">${h.kicker}</p>
       <h1>${h.heading}</h1>
       <p class="lead">${h.lead}</p>
       <div class="actions">
-        <a class="btn btn-primary btn-lg" href="#projects"><span>${h.ctaProjects}</span>${icons.arrow}</a>
-        <a class="btn btn-secondary btn-lg" href="mailto:${site.email}">${icons.mail}<span>${h.ctaContact}</span></a>
+        <a class="btn btn-primary btn-lg" href="#games"><span>${h.ctaGames}</span>${icons.arrow}</a>
+        <a class="hero-mail" href="mailto:${site.email}">${icons.mail}<span>${site.email}</span></a>
       </div>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="hero-blob"></div>
-      <div class="hero-shape hero-shape-ring"></div>
-      <div class="hero-shape hero-shape-dot"></div>
-      <div class="hero-shape hero-shape-bar"></div>
-      ${tiles}
-      <div class="hero-logo">${logo(120)}</div>
-    </div>
+    <div class="hero-art">${art('hero', 'hero-img', { lazy: false, priority: true })}</div>
   </div>
 </section>
 
-<section class="section" id="projects" aria-labelledby="projects-title">
+<section class="section" id="games" aria-labelledby="games-title">
   <div class="wrap">
-    <div class="section-head">
-      <h2 id="projects-title">${h.projectsTitle}</h2>
-      <p>${h.projectsLead}</p>
-    </div>
-    <div class="project-grid">${cards}</div>
+    <h2 class="section-title" id="games-title">${h.gamesTitle}</h2>
+    <div class="games">${games}</div>
   </div>
 </section>
 
-<section class="section section-tint" aria-labelledby="principles-title">
-  <div class="wrap">
-    <div class="section-head">
-      <h2 id="principles-title">${h.principlesTitle}</h2>
+<section class="section studio" id="studio" aria-labelledby="studio-title">
+  <div class="wrap studio-grid">
+    <div class="studio-copy">
+      <h2 id="studio-title">${h.studioTitle}</h2>
+      ${h.studio.map((p) => `<p>${p}</p>`).join('')}
     </div>
-    <ul class="principles">
-      ${h.principles.map((x, i) => `<li><span class="principle-icon">${principleIcons[i]}</span><h3>${x.title}</h3><p>${x.text}</p></li>`).join('')}
-    </ul>
-  </div>
-</section>
-
-<section class="section" id="about" aria-labelledby="about-title">
-  <div class="wrap about-grid">
-    <div class="about-copy">
-      <h2 id="about-title">${h.aboutTitle}</h2>
-      ${h.about.map((p) => `<p>${p}</p>`).join('')}
-    </div>
-    <aside class="contact-card" id="contact" aria-labelledby="contact-title">
-      <h2 id="contact-title">${h.contactTitle}</h2>
+    <aside class="contact" aria-labelledby="contact-title">
+      ${art('logo', 'contact-mark')}
+      <h3 id="contact-title">${h.contactTitle}</h3>
       <p>${h.contactText}</p>
-      <a class="contact-email" href="mailto:${site.email}">${icons.mail}<span>${site.email}</span></a>
-      <a class="contact-link" href="${site.github}">${icons.github}<span>github.com/${site.github.split('/').pop()}</span></a>
-      <a class="contact-link" href="${href(lang, '/support/')}">${icons.help}<span>${t.nav.support}</span></a>
+      <a class="contact-email" href="mailto:${site.email}">${site.email}</a>
+      <a class="contact-support" href="${href(lang, '/support/')}">${icons.help}<span>${t.nav.support}</span></a>
     </aside>
   </div>
 </section>`,
@@ -270,7 +236,8 @@ export function project(lang, p) {
   return {
     title: `${p.name} · ${d.kind} · ${site.name}`,
     description: `${d.tagline} ${d.summary}`,
-    image: img(p.slug, lang, 'feature.jpg'),
+    image: `/img/${p.slug}/${lang}/feature.jpg`,
+    section: '#games',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
@@ -285,12 +252,12 @@ export function project(lang, p) {
       publisher: { '@type': 'Organization', name: site.name, url: site.url + '/' },
     },
     body: `
-<section class="project-hero" style="${projectStyle(p)}">
+<section class="project-hero" style="${slabStyle(p)}">
   <div class="wrap project-hero-grid">
     <div class="project-hero-copy">
-      <a class="back-link" href="${href(lang, '/#projects')}">${icons.back}<span>${t.project.back}</span></a>
+      <a class="back-link" href="${href(lang, '/#games')}">${icons.back}<span>${t.project.back}</span></a>
       <div class="project-title">
-        <img class="app-icon app-icon-lg" src="/img/${p.slug}/icon.webp" alt="" width="96" height="96">
+        <img class="app-icon app-icon-lg" src="/img/${p.slug}/icon.webp" alt="" width="88" height="88">
         <div>
           <h1>${p.name}</h1>
           <p class="kind">${d.kind} · ${site.name}</p>
@@ -299,9 +266,7 @@ export function project(lang, p) {
       <p class="lead">${d.tagline}</p>
       <div class="actions">${storeButtons(lang, p)}</div>
     </div>
-    <div class="project-hero-media">
-      <figure class="phone"><img src="${img(p.slug, lang, 'shot-1.webp')}" alt="${esc(d.screenshots[0])}" width="540" height="960"></figure>
-    </div>
+    <div class="project-hero-media">${art(p.art, 'game-art', { lazy: false, priority: true })}</div>
   </div>
 </section>
 
@@ -311,30 +276,37 @@ export function project(lang, p) {
   </div>
 </section>
 
-<section class="section section-tint" aria-labelledby="features-title" style="${projectStyle(p)}">
+<section class="section learn-section" aria-labelledby="learn-title" style="${slabStyle(p)}">
+  <div class="wrap learn-grid">
+    <h2 id="learn-title">${t.project.learn}</h2>
+    ${learnList(d.learn, 'learn learn-lg')}
+  </div>
+</section>
+
+<section class="section" aria-labelledby="features-title">
   <div class="wrap">
-    <div class="section-head"><h2 id="features-title">${t.project.features}</h2></div>
+    <h2 class="section-title" id="features-title">${t.project.features}</h2>
     <ul class="features">
       ${d.features.map((f) => `<li><h3>${f.title}</h3><p>${f.text}</p></li>`).join('')}
     </ul>
   </div>
 </section>
 
-<section class="section" aria-labelledby="shots-title">
+<section class="section section-flush" aria-labelledby="shots-title">
   <div class="wrap">
-    <div class="section-head"><h2 id="shots-title">${t.project.screenshots}</h2></div>
+    <h2 class="section-title" id="shots-title">${t.project.screenshots}</h2>
   </div>
   <ul class="gallery" tabindex="0" aria-labelledby="shots-title">
     ${shots
-      .map((n) => `<li><figure class="phone"><img src="${img(p.slug, lang, `shot-${n}.webp`)}" alt="${esc(d.screenshots[n - 1])}" width="540" height="960" loading="lazy" decoding="async"></figure></li>`)
+      .map((n) => `<li><figure class="phone"><img src="${shot(p.slug, lang, n)}" alt="${esc(d.screenshots[n - 1])}" width="540" height="960" loading="lazy" decoding="async"></figure></li>`)
       .join('')}
   </ul>
 </section>
 
-<section class="section section-tint" aria-labelledby="details-title">
+<section class="section" aria-labelledby="details-title">
   <div class="wrap details-grid">
     <div>
-      <h2 id="details-title">${t.project.details}</h2>
+      <h2 class="section-title" id="details-title">${t.project.details}</h2>
       <dl class="facts">
         <div><dt>${t.project.developer}</dt><dd><a href="${href(lang, '/')}">${site.name}</a></dd></div>
         <div><dt>${t.project.platforms}</dt><dd>${p.platforms.map((k) => t.platforms[k]).join(', ')}</dd></div>
@@ -344,12 +316,12 @@ export function project(lang, p) {
         <div><dt>${t.project.privacy}</dt><dd><a href="${privacy}">${site.domain}${privacy}</a></dd></div>
       </dl>
     </div>
-    <aside class="help-card">
+    <aside class="help">
       <h2>${t.project.helpTitle}</h2>
       <p>${t.project.helpText}</p>
       <div class="actions">
         <a class="btn btn-primary" href="${support}">${icons.help}<span>${t.project.support}</span></a>
-        <a class="btn btn-secondary" href="${privacy}">${icons.shield}<span>${t.project.privacy}</span></a>
+        <a class="btn btn-light" href="${privacy}">${icons.shield}<span>${t.project.privacy}</span></a>
       </div>
     </aside>
   </div>
@@ -365,7 +337,6 @@ export function appPrivacy(lang, p) {
   return {
     title: `${p.name} · ${t.project.privacy} · ${site.name}`,
     description: `${t.privacy.policyFor} ${p.name}. ${site.name}.`,
-    section: '/privacy/',
     body: `
 <article class="doc">
   <div class="wrap narrow">
@@ -397,7 +368,6 @@ export function privacy(lang) {
   return {
     title: `${t.privacy.title} · ${site.name}`,
     description: t.privacy.description,
-    section: '/privacy/',
     body: `
 <article class="doc">
   <div class="wrap narrow">
@@ -407,12 +377,12 @@ export function privacy(lang) {
     </header>
     <section aria-labelledby="apps-title">
       <h2 id="apps-title">${t.privacy.appsTitle}</h2>
-      <ul class="link-cards">
+      <ul class="link-list">
         ${projects
           .map(
-            (p) => `<li style="${projectStyle(p)}"><a href="${href(lang, `/${p.slug}/privacy/`)}">
+            (p) => `<li><a href="${href(lang, `/${p.slug}/privacy/`)}" style="${slabStyle(p)}">
               <img class="app-icon" src="/img/${p.slug}/icon.webp" alt="" width="48" height="48">
-              <span><strong>${p.name}</strong><small>${t.project.privacy} · ${t.privacy.lastUpdated}: ${formatDate(lang, p.privacy.updated)}</small></span>
+              <span><strong>${p.name}</strong><small>${t.privacy.lastUpdated}: ${formatDate(lang, p.privacy.updated)}</small></span>
               ${icons.arrow}
             </a></li>`,
           )
@@ -444,16 +414,17 @@ export function support(lang) {
       <h1>${t.support.heading}</h1>
       <p class="lead">${t.support.lead}</p>
     </header>
-    <section class="contact-card contact-card-wide" aria-labelledby="email-title">
+    <section class="contact contact-wide" aria-labelledby="email-title">
+      ${art('logo', 'contact-mark')}
       <h2 id="email-title">${t.support.emailTitle}</h2>
       <p>${t.support.emailText}</p>
-      <a class="contact-email" href="mailto:${site.email}">${icons.mail}<span>${site.email}</span></a>
+      <a class="contact-email" href="mailto:${site.email}">${site.email}</a>
     </section>
     <h2 class="faq-title">${t.support.faqTitle}</h2>
     ${projects
       .map((p) => {
         const privacyUrl = href(lang, `/${p.slug}/privacy/`);
-        return `<section class="faq" id="${p.slug}" aria-labelledby="faq-${p.slug}" style="${projectStyle(p)}">
+        return `<section class="faq" id="${p.slug}" aria-labelledby="faq-${p.slug}">
           <div class="faq-head">
             <img class="app-icon" src="/img/${p.slug}/icon.webp" alt="" width="48" height="48">
             <h3 id="faq-${p.slug}"><a href="${href(lang, `/${p.slug}/`)}">${p.name}</a></h3>
@@ -482,7 +453,7 @@ export function notFound() {
     body: `
 <section class="not-found">
   <div class="wrap narrow">
-    <p class="code" aria-hidden="true">404</p>
+    ${art('logo', 'not-found-mark', { lazy: false })}
     <h1>${a.heading}</h1>
     <p>${a.text}</p>
     <p class="actions"><a class="btn btn-primary" href="/">${icons.back}<span>${a.home}</span></a></p>

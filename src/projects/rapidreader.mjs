@@ -7,7 +7,11 @@ export default {
   slug: 'rapidreader',
   name: 'RapidReader',
   appId: 'com.rapidreader.rapid_reader',
+  // Colours of the app's own screens (project page header) and its slab on the home page.
   theme: { accent: '#f0525a', ink: '#ffffff', surface: '#121212' },
+  slab: { light: '#e4e3fa', dark: '#262745' },
+  // Play-dough illustration from art/scenes.mjs.
+  art: 'books',
   links: {
     // Set live: true once the app is public on Google Play; until then the button reads "Coming soon".
     googlePlay: { url: 'https://play.google.com/store/apps/details?id=com.rapidreader.rapid_reader', live: false },
@@ -22,6 +26,13 @@ export default {
   en: {
     kind: 'Speed reading app',
     tagline: 'Speed read word by word, with guided reading and an easy-on-the-eyes page.',
+    learn: [
+      'Reading word by word (RSVP) without moving your eyes along the line',
+      'The focus letter (ORP) your eye locks onto in every word',
+      'Raising your speed step by step, from 100 to 1000 words a minute',
+      'Practising on the classics: Dickens, Kafka, Ömer Seyfettin',
+      'Guided reading and a dyslexia-friendly font',
+    ],
     summary:
       'Words appear one at a time at the centre of the screen, with the focus letter marked in red, so your eyes never travel along the line.',
     intro: [
@@ -59,6 +70,13 @@ export default {
   tr: {
     kind: 'Hızlı okuma uygulaması',
     tagline: 'Kelime kelime hızlı oku; rehberli okuma ve göz yormayan bir sayfayla.',
+    learn: [
+      'Gözünü satırda gezdirmeden kelime kelime okumak (RSVP)',
+      'Gözün her kelimede tutunduğu odak harfi (ORP)',
+      'Okuma hızını dakikada 100’den 1000 kelimeye adım adım artırmak',
+      'Klasiklerle pratik: Dickens, Kafka, Ömer Seyfettin',
+      'Rehberli okuma ve disleksi dostu yazı tipi',
+    ],
     summary:
       'Kelimeler ekranın ortasında tek tek belirir, odak harfi kırmızıyla işaretlenir; gözün satır boyunca hiç gezinmez.',
     intro: [

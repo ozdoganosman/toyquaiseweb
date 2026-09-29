@@ -1,8 +1,12 @@
 # toyquaise.com
 
-Toyquaise stüdyosunun web sitesi: Google Play (ve ileride App Store) gibi mağazalarda geliştirici
-kimliği olarak gösterilen resmi site. Oyunları ve uygulamaları tanıtır, her birinin gizlilik
-politikasını ve destek sayfasını barındırır.
+Toyquaise'in web sitesi. Toyquaise, eğitim ve oyun içeriklerini bir araya getirerek öğretici
+oyunlar geliştiren, Türkiye merkezli bir oyun geliştirme stüdyosu. Site, Google Play (ve ileride
+App Store) gibi mağazalarda geliştirici kimliği olarak kullanılır: oyunları ve uygulamaları
+tanıtır, her birinin gizlilik politikasını ve destek sayfasını barındırır.
+
+Görsel dil oyun hamuru: çizimler `art/scenes.mjs` içinde SVG olarak tanımlı, bir "hamur" filtresiyle
+ışıklandırılıp `public/img/art/` altına resim olarak işlenir.
 
 Site İngilizce (kök adres) ve Türkçedir (`/tr/`). Bağımlılığı yoktur; yalnızca Node.js gerekir.
 
@@ -35,8 +39,10 @@ src/projects/<proje>.mjs     Her projenin metinleri, SSS'si ve gizlilik politika
 src/projects/index.mjs       Sitede gösterilen projeler ve sıraları
 src/pages.mjs                Sayfa şablonları
 src/styles.css               Tüm stil (açık ve koyu tema)
+art/scenes.mjs               Oyun hamuru çizimleri (SVG) ve hamur filtresi
 public/                      Olduğu gibi kopyalanan dosyalar: görseller, yazı tipleri, app-ads.txt, CNAME
 scripts/build.mjs            Derleyici ve bağlantı denetimi
+scripts/render-art.mjs       Çizimleri, site simgelerini ve paylaşım görselini (og.jpg) üretir
 ```
 
 ### Sık yapılacak değişiklikler
@@ -48,10 +54,22 @@ scripts/build.mjs            Derleyici ve bağlantı denetimi
   politikaları bunu kullanır.
 - **Gizlilik politikası değişti:** projenin dosyasındaki `privacy` bölümünü düzenle ve
   `updated` tarihini yenile.
-- **Yeni proje:** `src/projects/` altına mevcut bir dosyanın kopyasını ekle, `index.mjs`'teki
+- **Yeni proje:** `src/projects/` altına mevcut bir dosyanın kopyasını ekle (metinler, "oynarken
+  öğrenirsin" listesi `learn`, ana sayfadaki plakanın rengi `slab`, çizim `art`), `index.mjs`'teki
   listeye yaz, görselleri `public/img/<slug>/` altına koy:
   `icon.webp` (256×256), `en/` ve `tr/` klasörlerinde `feature.webp` ve `feature.jpg`
   (1024×500, mağazadaki öne çıkan görsel) ile `shot-1.webp`, `shot-2.webp`… (540×960).
+
+### Çizimler
+
+Çizimler elle çizilmiş basit şekillerden oluşur (top, rulo, yuvarlatılmış kutu); hamur görünümünü
+`clayFilter` verir. Bir çizimi değiştirmek ya da yenisini eklemek için `art/scenes.mjs`'i düzenle
+ve şunu çalıştır (Playwright ve Chromium gerekir; sitenin derlenmesi için gerekmez):
+
+```bash
+node scripts/render-art.mjs          # hepsi
+node scripts/render-art.mjs car og   # yalnızca bunlar
+```
 
 ## Yayınlama (GitHub Pages)
 
@@ -111,5 +129,5 @@ derleme bunu denetler.
 
 ## Lisanslar
 
-Yazı tipleri SIL Open Font License 1.1 ile dağıtılır: Bricolage Grotesque ve Inter
-(`public/fonts/*-OFL.txt`). Oyun ve uygulama görselleri ile metinleri Toyquaise'e aittir.
+Yazı tipleri SIL Open Font License 1.1 ile dağıtılır: DynaPuff (başlıklar) ve Lexend (metin;
+okuma akıcılığı için tasarlandı) (`public/fonts/*-OFL.txt`). Oyun ve uygulama görselleri ile metinleri Toyquaise'e aittir.

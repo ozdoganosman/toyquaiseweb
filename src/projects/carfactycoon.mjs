@@ -8,7 +8,11 @@ export default {
   slug: 'carfactycoon',
   name: 'CarFacTycoon',
   appId: 'io.github.ozdoganosman.carfactycoon',
+  // Colours of the game's own screens (project page header) and its slab on the home page.
   theme: { accent: '#b8492f', ink: '#fbf7ef', surface: '#26241f' },
+  slab: { light: '#fbe3d3', dark: '#3a2820' },
+  // Play-dough illustration from art/scenes.mjs.
+  art: 'car',
   links: {
     // Set live: true once the game is public on Google Play; until then the button reads "Coming soon".
     googlePlay: { url: 'https://play.google.com/store/apps/details?id=io.github.ozdoganosman.carfactycoon', live: false },
@@ -23,6 +27,13 @@ export default {
   en: {
     kind: 'Tycoon game',
     tagline: 'America, 1900: design your cars, build the factory, grow state by state.',
+    learn: [
+      'How a four-stroke engine works: compression, knock and firing order',
+      'Reading a torque curve and choosing a cylinder layout',
+      'Mass production: presses, bottlenecks, night shifts and the moving line',
+      'Running a public company: shares, dividends and a board that wants growth',
+      'Car history from 1900 to 1960, the 1929 crash included',
+    ],
     summary:
       'Start with a small workshop, a handful of engineers and a little money. Your goal: one of the country’s great car makers by 1960.',
     intro: [
@@ -61,6 +72,13 @@ export default {
   tr: {
     kind: 'Tycoon oyunu',
     tagline: '1900 Amerika’sı: arabanı tasarla, fabrikanı kur, eyalet eyalet büyü.',
+    learn: [
+      'Dört zamanlı motor nasıl çalışır: sıkıştırma, vuruntu, ateşleme sırası',
+      'Tork eğrisini okumak ve silindir dizilimi seçmek',
+      'Seri üretim: pres, darboğaz, gece vardiyası ve yürüyen bant',
+      'Halka açık şirket yönetmek: hisse, temettü, büyüme bekleyen yönetim kurulu',
+      '1900’den 1960’a otomobil tarihi, 1929 buhranı dahil',
+    ],
     summary:
       'Küçük bir atölye, bir avuç mühendis ve biraz parayla başla. Amacın 1960’a kadar ülkenin büyük otomobil markalarından biri olmak.',
     intro: [
