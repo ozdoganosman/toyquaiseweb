@@ -78,6 +78,15 @@ yayınlar. Bir kez yapılacaklar:
 4. Önerilir: GitHub → profil **Settings → Pages → Add a domain** ile `toyquaise.com`'u
    doğrula; başkası alan adını kendi GitHub sayfasına bağlayamaz.
 
+## E-posta (info@toyquaise.com)
+
+Sitedeki ve gizlilik politikalarındaki iletişim adresi `info@toyquaise.com`. Mağazalar bu adresin
+gerçekten okunmasını ister, bu yüzden alan adına gelen postanın bir gelen kutusuna ulaşması
+gerekir. Alan adını aldığın firmanın e-posta yönlendirme özelliğiyle ya da Cloudflare Email
+Routing, Zoho Mail, Google Workspace gibi bir hizmetle `info@toyquaise.com`'u kendi gelen
+kutuna yönlendir. Bu hizmetlerin istediği MX ve TXT kayıtları, yukarıdaki GitHub Pages
+kayıtlarıyla çakışmaz. Kurduktan sonra adrese bir deneme e-postası gönder.
+
 ## Mağazalarda kullanılacak adresler
 
 **Google Play Console**
@@ -86,7 +95,7 @@ yayınlar. Bir kez yapılacaklar:
 - **Web sitesi** (Mağaza varlığı → Mağaza ayarları → Mağaza girişi iletişim bilgileri):
   `https://toyquaise.com`. AdMob `app-ads.txt` dosyasını bu adresin kökünde arar;
   dosya `https://toyquaise.com/app-ads.txt` adresinde hazır.
-- **E-posta:** `src/site.mjs` içindeki adres.
+- **E-posta:** `info@toyquaise.com`
 - **Gizlilik politikası** (Politika → Uygulama içeriği):
   - CarFacTycoon: `https://toyquaise.com/carfactycoon/privacy/`
   - RapidReader: `https://toyquaise.com/rapidreader/privacy/`

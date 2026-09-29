@@ -5,9 +5,8 @@ export const site = {
   domain: 'toyquaise.com',
   url: 'https://toyquaise.com',
   // Shown on every page and in every privacy policy. Google Play and the App Store require a
-  // contact address that is read; switch to e.g. support@toyquaise.com once mail for the domain
-  // forwards to an inbox.
-  email: 'ozdoganosman@gmail.com',
+  // contact address that is read, so mail for the domain must reach an inbox (see README.md).
+  email: 'info@toyquaise.com',
   github: 'https://github.com/ozdoganosman',
   foundedYear: 2026,
   // AdMob publisher ID. public/app-ads.txt must carry the same number.
