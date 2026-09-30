@@ -14,7 +14,7 @@ export default {
   art: 'books',
   links: {
     // Set live: true once the app is public on Google Play; until then the button reads "Coming soon".
-    googlePlay: { url: 'https://play.google.com/store/apps/details?id=com.rapidreader.rapid_reader', live: false },
+    googlePlay: { url: 'https://play.google.com/store/apps/details?id=com.rapidreader.rapid_reader', live: true },
     web: 'https://ozdoganosman.github.io/RapidReader/',
   },
   // schema.org category, for search engines.
